@@ -34,7 +34,7 @@
         </div>
     </nav>
 
-    {{-- Konten utama --}}
+    {{-- Main content --}}
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
         @if (session('success'))
             <div class="bg-green-600 text-white px-4 py-2 rounded mb-4">
