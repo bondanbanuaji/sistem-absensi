@@ -31,7 +31,7 @@
 
 1. **Clone the repo:**
 ```bash
-git clone git@github.com:your-username/sistem-absensi.git
+git clone git@github.com:bondanbanuajj/sistem-absensi.git
 cd sistem-absensi
 ```
 
