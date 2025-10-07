@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    background: linear-gradient(135deg, #2b1055, #7597de);
+    font-family: 'Inter', sans-serif;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+a {
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #c084fc;
+}

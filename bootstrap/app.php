@@ -1,11 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Configuration\Exceptions;
-use App\Http\Middleware\RoleMiddleware;
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,11 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Illuminate\Foundation\Configuration\Middleware $middleware) {
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'auth' => Authenticate::class,
-            'verified' => EnsureEmailIsVerified::class,
-            'role' => RoleMiddleware::class,
+            'auth' => Illuminate\Auth\Middleware\Authenticate::class,
+            'verified' => Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+            'role' => App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
-    ->create();
+    ->withExceptions(function (Exceptions $exceptions) {
+    })->create();
