@@ -1,12 +1,13 @@
-{{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Sistem Absensi' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
 
     {{-- Navbar --}}
@@ -15,8 +16,14 @@
             <h1 class="text-xl font-bold text-indigo-400">📋 Sistem Absensi</h1>
             <div class="space-x-4">
                 <a href="{{ route('dashboard') }}" class="hover:text-indigo-400">Dashboard</a>
-                <a href="{{ route('students.index') }}" class="hover:text-indigo-400">Siswa</a>
-                <a href="{{ route('attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
+
+                @if(Auth::user()->role === 'admin')
+                    <a href="{{ route('students.index') }}" class="hover:text-indigo-400">Siswa</a>
+                    <a href="{{ route('attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
+                @elseif(Auth::user()->role === 'teacher')
+                    <a href="{{ route('teacher.attendance.index') }}" class="hover:text-indigo-400">Absensi</a>
+                @endif
+
                 @auth
                     <form action="{{ route('logout') }}" method="POST" class="inline">
                         @csrf
@@ -44,4 +51,5 @@
     </footer>
 
 </body>
+
 </html>

@@ -19,7 +19,6 @@ class DashboardController extends Controller
         $today = Carbon::today();
         $todayAttendances = Attendance::whereDate('created_at', $today)->count();
 
-        // Perbaikan Query untuk MySQL strict mode (tanpa GROUP BY error)
         $attendanceStats = Attendance::selectRaw('DATE(created_at) as date, COUNT(id) as total')
             ->groupBy('date')
             ->orderBy('date', 'asc')
@@ -56,12 +55,18 @@ class DashboardController extends Controller
     public function student()
     {
         $user = Auth::user();
-        $student = Student::where('email', $user->email)->first();
+        $student = Student::where('user_id', $user->id)->first();
 
         $attendances = $student
             ? Attendance::where('student_id', $student->id)->latest()->take(10)->get()
             : collect();
 
-        return view('dashboard.student', compact('student', 'attendances'));
+        // Untuk chart
+        $chartLabels = $attendances->pluck('created_at')->map(function ($d) {
+            return $d->format('Y-m-d');
+        })->toArray();
+        $chartData = $attendances->pluck('status')->toArray(); // misal status hadir
+
+        return view('dashboard.student', compact('student', 'attendances', 'chartLabels', 'chartData'));
     }
 }
