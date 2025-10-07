@@ -1,30 +1,47 @@
+{{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Absensi Sekolah</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title ?? 'Sistem Absensi' }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-light">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container">
-      <a class="navbar-brand" href="{{ url('/') }}">Absensi Sekolah</a>
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a href="{{ route('students.index') }}" class="nav-link">Siswa</a></li>
-        <li class="nav-item"><a href="{{ route('attendances.index') }}" class="nav-link">Absensi</a></li>
-      </ul>
-    </div>
-  </nav>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
 
-  <main class="container">
-    @if(session('success'))
-      <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    {{-- Navbar --}}
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-indigo-400">📋 Sistem Absensi</h1>
+            <div class="space-x-4">
+                <a href="{{ route('dashboard') }}" class="hover:text-indigo-400">Dashboard</a>
+                <a href="{{ route('students.index') }}" class="hover:text-indigo-400">Siswa</a>
+                <a href="{{ route('attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
+                @auth
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="hover:text-red-400">Logout</button>
+                    </form>
+                @endauth
+            </div>
+        </div>
+    </nav>
 
-    @yield('content')
-  </main>
+    {{-- Konten utama --}}
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+        @if (session('success'))
+            <div class="bg-green-600 text-white px-4 py-2 rounded mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        {{ $slot }}
+    </main>
+
+    {{-- Footer --}}
+    <footer class="bg-gray-800 text-center py-3 text-sm text-gray-400">
+        &copy; {{ date('Y') }} Sistem Absensi | Dibuat oleh Banu 🚀
+    </footer>
+
 </body>
 </html>

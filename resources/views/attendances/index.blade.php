@@ -1,60 +1,52 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
+            Data Absensi
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3>Absensi — {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</h3>
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-  <div class="d-flex gap-2">
-    <form action="{{ route('attendances.index') }}" method="GET" class="d-flex gap-2">
-      <input type="date" name="date" value="{{ $date }}" class="form-control form-control-sm">
-      <button class="btn btn-sm btn-outline-primary">Tampilkan</button>
-    </form>
+            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 text-gray-900 dark:text-gray-100">
+                <form method="GET" action="{{ route('attendances.index') }}" class="flex gap-4 mb-4">
+                    <input type="date" name="date" value="{{ request('date') }}"
+                           class="rounded-lg border-gray-300 dark:bg-gray-700 dark:text-white">
+                    <input type="text" name="name" value="{{ request('name') }}" placeholder="Cari nama siswa..."
+                           class="rounded-lg border-gray-300 dark:bg-gray-700 dark:text-white">
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Filter</button>
+                </form>
 
-    <a href="{{ route('attendances.create') }}?date={{ $date }}" class="btn btn-primary btn-sm">Tambah Absen</a>
-  </div>
-</div>
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Nama</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        @foreach ($attendances as $attendance)
+                        <tr>
+                            <td class="px-6 py-4">{{ $attendance->student->name }}</td>
+                            <td class="px-6 py-4">{{ $attendance->date }}</td>
+                            <td class="px-6 py-4 capitalize">{{ $attendance->status }}</td>
+                            <td class="px-6 py-4">
+                                <a href="{{ route('attendances.edit', $attendance) }}" class="text-yellow-500 hover:underline">Edit</a>
+                                <form action="{{ route('attendances.destroy', $attendance) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="text-red-600 hover:underline" onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-@if($attendances->isEmpty())
-  <div class="alert alert-secondary">Belum ada data absensi untuk tanggal ini.</div>
-@else
-  <table class="table table-striped">
-    <thead class="table-dark">
-      <tr>
-        <th>#</th>
-        <th>NIS</th>
-        <th>Nama</th>
-        <th>Status</th>
-        <th>Time In</th>
-        <th>Time Out</th>
-        <th>Note</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($attendances as $a)
-      <tr>
-        <td>{{ $loop->iteration }}</td>
-        <td>{{ $a->student->nis }}</td>
-        <td>
-          <a href="{{ route('students.show', $a->student) }}">
-            {{ $a->student->name }}
-          </a>
-        </td>
-        <td>{{ strtoupper($a->status) }}</td>
-        <td>{{ $a->time_in ?? '-' }}</td>
-        <td>{{ $a->time_out ?? '-' }}</td>
-        <td>{{ $a->note ?? '-' }}</td>
-        <td>
-          <a href="{{ route('attendances.edit', $a) }}" class="btn btn-sm btn-warning">Edit</a>
-
-          <form action="{{ route('attendances.destroy', $a) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus data absensi ini?')">
-            @csrf @method('DELETE')
-            <button class="btn btn-sm btn-danger">Hapus</button>
-          </form>
-        </td>
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
-@endif
-@endsection
+                <div class="mt-4">{{ $attendances->links() }}</div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

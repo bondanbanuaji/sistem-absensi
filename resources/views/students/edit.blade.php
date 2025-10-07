@@ -1,37 +1,29 @@
-@extends('layouts.app')
+<x-app-layout title="Edit Siswa">
+    <div class="bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-6 text-indigo-400">Edit Data Siswa</h2>
 
-@section('content')
-<h3>Edit Siswa</h3>
+        <form action="{{ route('students.update', $student) }}" method="POST" class="space-y-4">
+            @csrf
+            @method('PUT')
 
-<form action="{{ route('students.update', $student) }}" method="POST" enctype="multipart/form-data" class="mt-3">
-  @csrf @method('PUT')
-  
-  <div class="mb-3">
-    <label>NIS</label>
-    <input type="text" name="nis" class="form-control" value="{{ $student->nis }}" required>
-  </div>
+            <div>
+                <label class="block mb-2">Nama</label>
+                <input type="text" name="name" value="{{ $student->name }}" class="w-full bg-gray-700 border border-gray-600 rounded p-2" required>
+            </div>
 
-  <div class="mb-3">
-    <label>Nama</label>
-    <input type="text" name="name" class="form-control" value="{{ $student->name }}" required>
-  </div>
+            <div>
+                <label class="block mb-2">NIS</label>
+                <input type="text" name="nis" value="{{ $student->nis }}" class="w-full bg-gray-700 border border-gray-600 rounded p-2" required>
+            </div>
 
-  <div class="mb-3">
-    <label>Kelas</label>
-    <input type="text" name="kelas" class="form-control" value="{{ $student->kelas }}">
-  </div>
+            <div>
+                <label class="block mb-2">Kelas</label>
+                <input type="text" name="class" value="{{ $student->class }}" class="w-full bg-gray-700 border border-gray-600 rounded p-2" required>
+            </div>
 
-  <div class="mb-3">
-    <label>Telepon</label>
-    <input type="text" name="phone" class="form-control" value="{{ $student->phone }}">
-  </div>
-
-  <div class="mb-3">
-    <label>Foto</label>
-    <input type="file" name="photo" class="form-control">
-  </div>
-
-  <button type="submit" class="btn btn-warning">Perbarui</button>
-  <a href="{{ route('students.index') }}" class="btn btn-secondary">Kembali</a>
-</form>
-@endsection
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white transition">
+                Update
+            </button>
+        </form>
+    </div>
+</x-app-layout>

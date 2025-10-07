@@ -1,33 +1,49 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            Dashboard
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="container py-5">
-    <h1 class="mb-4 text-center">📊 Dashboard Absensi Sekolah</h1>
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-    <div class="row g-4 justify-content-center">
-        <div class="col-md-3">
-            <div class="card shadow text-center p-3 border-0" style="background-color: #f3f6ff;">
-                <h5>Total Siswa</h5>
-                <h2 class="text-primary">{{ $totalStudents }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                    <h3 class="text-lg font-semibold">Total Siswa</h3>
+                    <p class="text-3xl mt-2">{{ $totalStudents }}</p>
+                </div>
+
+                <div class="p-6 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                    <h3 class="text-lg font-semibold">Absensi Hari Ini</h3>
+                    <p class="text-3xl mt-2">{{ $todayAttendances }}</p>
+                </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow text-center p-3 border-0" style="background-color: #e8fff1;">
-                <h5>Absensi Hari Ini</h5>
-                <h2 class="text-success">{{ $totalAttendancesToday }}</h2>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow text-center p-3 border-0" style="background-color: #fff8e5;">
-                <h5>Persentase Kehadiran</h5>
-                <h2 class="text-warning">{{ $attendancePercentage }}%</h2>
+
+            {{-- Grafik Kehadiran --}}
+            <div class="p-6 bg-white dark:bg-gray-800 shadow sm:rounded-lg mt-6">
+                <h3 class="text-lg font-semibold mb-4">Grafik Kehadiran Minggu Ini</h3>
+                <canvas id="attendanceChart" width="400" height="200"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="mt-5 text-center">
-        <a href="{{ route('attendances.index') }}" class="btn btn-primary px-4">Lihat Data Absensi</a>
-        <a href="{{ route('students.index') }}" class="btn btn-outline-secondary px-4">Kelola Siswa</a>
-    </div>
-</div>
-@endsection
+    {{-- Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('attendanceChart').getContext('2d');
+        const attendanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @json($chartLabels),
+                datasets: [{
+                    label: 'Jumlah Kehadiran',
+                    data: @json($chartData),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+        });
+    </script>
+</x-app-layout>

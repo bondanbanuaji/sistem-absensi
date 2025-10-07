@@ -1,33 +1,35 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\DashboardController;
 
-// Halaman dashboard utama
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-// Redirect root ke halaman absensi
 Route::get('/', function () {
-    return redirect()->route('attendances.index');
+    return view('welcome');
 });
 
-// CRUD Siswa
-Route::resource('students', StudentController::class);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// CRUD Absensi
-Route::resource('attendances', AttendanceController::class);
-
-// Filter absensi berdasarkan tanggal (optional)
-Route::get('/attendances/filter', [AttendanceController::class, 'filter'])->name('attendances.filter');
-
-// Cek koneksi database (debug)
-Route::get('/check-db', function () {
-    try {
-        \DB::connection()->getPdo();
-        return '✅ Database terkoneksi: ' . \DB::connection()->getDatabaseName();
-    } catch (\Exception $e) {
-        return '❌ Gagal konek database: ' . $e->getMessage();
-    }
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+});
+
+// Semua fitur hanya untuk user yang sudah login
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('students', StudentController::class);
+    Route::resource('attendances', AttendanceController::class);
+});
+
+require __DIR__.'/auth.php';

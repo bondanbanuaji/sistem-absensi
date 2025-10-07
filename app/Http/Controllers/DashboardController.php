@@ -2,27 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Attendance;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Hitung jumlah siswa
         $totalStudents = Student::count();
 
-        // Hitung jumlah absensi hari ini
-        $today = now()->toDateString();
-        $totalAttendancesToday = Attendance::whereDate('created_at', $today)->count();
+        $today = Carbon::today();
+        $todayAttendances = Attendance::whereDate('created_at', $today)->count();
 
-        // Persentase kehadiran (jika ada data)
-        $attendancePercentage = $totalStudents > 0
-            ? round(($totalAttendancesToday / $totalStudents) * 100, 2)
-            : 0;
+        // Data untuk chart (7 hari terakhir)
+        $attendanceStats = Attendance::selectRaw('DATE(created_at) as date, COUNT(id) as total')
+            ->groupByRaw('DATE(created_at)')
+            ->orderByRaw('DATE(created_at) asc')
+            ->limit(7)
+            ->get();
 
-        // Kirim data ke view
-        return view('dashboard', compact('totalStudents', 'totalAttendancesToday', 'attendancePercentage'));
+        // Ubah ke format chart-friendly
+        $chartLabels = $attendanceStats->pluck('date')->toArray();
+        $chartData = $attendanceStats->pluck('total')->toArray();
+
+        return view('dashboard', compact(
+            'totalStudents',
+            'todayAttendances',
+            'chartLabels',
+            'chartData'
+        ));
     }
 }
