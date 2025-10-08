@@ -10,7 +10,8 @@
             <h3 class="text-lg font-semibold mb-3">Selamat datang, {{ Auth::user()->name }}!</h3>
             <p class="text-gray-600 dark:text-gray-300 mb-4">Berikut rekap absensi siswa hari ini:</p>
 
-            <div class="overflow-x-auto">
+            {{-- Tabel --}}
+            <div class="overflow-x-auto mb-6">
                 <table class="min-w-full text-left border border-gray-700 rounded-lg">
                     <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
@@ -34,6 +35,11 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- Shortcut ke halaman absensi --}}
+            <a href="{{ route('attendances.index') }}" class="inline-block px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                📋 Kelola Absensi Lengkap
+            </a>
 
             {{-- Chart --}}
             <div class="mt-8">
