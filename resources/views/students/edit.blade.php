@@ -1,50 +1,41 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-100">Edit Data Siswa</h2>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+            {{ __('Edit Student') }}
+        </h2>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto mt-6 bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <form action="{{ route('students.update', $student->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-            @csrf
-            @method('PUT')
+    <div class="py-6 max-w-4xl mx-auto">
+        <x-alert />
 
-            <div>
-                <label class="block text-gray-300 mb-2">NIS</label>
-                <input type="text" name="nis" value="{{ old('nis', $student->nis) }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200">
-            </div>
+        <x-card>
+            <form method="POST" action="{{ route('students.update', $student->id) }}">
+                @csrf
+                @method('PUT')
 
-            <div>
-                <label class="block text-gray-300 mb-2">Nama Lengkap</label>
-                <input type="text" name="name" value="{{ old('name', $student->name) }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200">
-            </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Name</label>
+                    <input type="text" name="name" value="{{ $student->name }}"
+                           class="w-full border-gray-300 rounded-lg mt-2" required>
+                </div>
 
-            <div>
-                <label class="block text-gray-300 mb-2">Kelas</label>
-                <input type="text" name="kelas" value="{{ old('kelas', $student->kelas) }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200">
-            </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Email</label>
+                    <input type="email" name="email" value="{{ $student->email }}"
+                           class="w-full border-gray-300 rounded-lg mt-2" required>
+                </div>
 
-            <div>
-                <label class="block text-gray-300 mb-2">Nomor Telepon</label>
-                <input type="text" name="phone" value="{{ old('phone', $student->phone) }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200">
-            </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Class</label>
+                    <input type="text" name="class" value="{{ $student->class }}"
+                           class="w-full border-gray-300 rounded-lg mt-2">
+                </div>
 
-            <div>
-                <label class="block text-gray-300 mb-2">Foto (ubah jika perlu)</label>
-                @if($student->photo)
-                    <img src="{{ asset('storage/'.$student->photo) }}" alt="Foto Siswa"
-                        class="h-24 rounded-lg mb-3 border border-gray-700">
-                @endif
-                <input type="file" name="photo" class="text-gray-200">
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <a href="{{ route('students.index') }}" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg">Batal</a>
-                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg">Perbarui</button>
-            </div>
-        </form>
+                <button type="submit"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Update
+                </button>
+            </form>
+        </x-card>
     </div>
 </x-app-layout>

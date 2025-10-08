@@ -1,51 +1,40 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-100">Tambah Siswa</h2>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+            {{ __('Add Student') }}
+        </h2>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto mt-6 bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <form action="{{ route('students.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-            @csrf
+    <div class="py-6 max-w-4xl mx-auto">
+        <x-alert />
 
-            <div>
-                <label class="block text-gray-300 mb-2">NIS</label>
-                <input type="text" name="nis" value="{{ old('nis') }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200 focus:ring-2 focus:ring-indigo-500">
-                @error('nis') <p class="text-red-400 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
+        <x-card>
+            <form method="POST" action="{{ route('students.store') }}">
+                @csrf
 
-            <div>
-                <label class="block text-gray-300 mb-2">Nama Lengkap</label>
-                <input type="text" name="name" value="{{ old('name') }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200 focus:ring-2 focus:ring-indigo-500">
-                @error('name') <p class="text-red-400 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Name</label>
+                    <input type="text" name="name" value="{{ old('name') }}"
+                           class="w-full border-gray-300 rounded-lg mt-2" required>
+                </div>
 
-            <div>
-                <label class="block text-gray-300 mb-2">Kelas</label>
-                <input type="text" name="kelas" value="{{ old('kelas') }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200">
-            </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}"
+                           class="w-full border-gray-300 rounded-lg mt-2" required>
+                </div>
 
-            <div>
-                <label class="block text-gray-300 mb-2">Nomor Telepon</label>
-                <input type="text" name="phone" value="{{ old('phone') }}"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200">
-            </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Class</label>
+                    <input type="text" name="class" value="{{ old('class') }}"
+                           class="w-full border-gray-300 rounded-lg mt-2">
+                </div>
 
-            <div>
-                <label class="block text-gray-300 mb-2">Foto (opsional)</label>
-                <input type="file" name="photo" class="text-gray-200">
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <a href="{{ route('students.index') }}"
-                   class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg">Batal</a>
                 <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg">
-                    Simpan
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Save
                 </button>
-            </div>
-        </form>
+            </form>
+        </x-card>
     </div>
 </x-app-layout>
