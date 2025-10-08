@@ -17,9 +17,9 @@ class DashboardController extends Controller
     {
         $totalStudents = Student::count();
         $today = Carbon::today();
-        $todayAttendances = Attendance::whereDate('created_at', $today)->count();
+        $todayAttendances = Attendance::whereDate('date', $today)->count();
 
-        $attendanceStats = Attendance::selectRaw('DATE(created_at) as date, COUNT(id) as total')
+        $attendanceStats = Attendance::selectRaw('DATE(date) as date, COUNT(id) as total')
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->limit(7)
@@ -43,10 +43,24 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        $todayAttendances = Attendance::whereDate('created_at', $today)->get();
-        $totalAttendances = Attendance::count();
+        $todayAttendances = Attendance::with('student')
+            ->whereDate('date', $today)
+            ->get();
 
-        return view('dashboard.teacher', compact('todayAttendances', 'totalAttendances'));
+        $weeklyStats = Attendance::selectRaw('DATE(date) as date, COUNT(id) as total')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->limit(7)
+            ->get();
+
+        $chartLabels = $weeklyStats->pluck('date')->toArray();
+        $chartData = $weeklyStats->pluck('total')->toArray();
+
+        return view('dashboard.teacher', compact(
+            'todayAttendances',
+            'chartLabels',
+            'chartData'
+        ));
     }
 
     /**
@@ -61,11 +75,16 @@ class DashboardController extends Controller
             ? Attendance::where('student_id', $student->id)->latest()->take(10)->get()
             : collect();
 
-        // Untuk chart
-        $chartLabels = $attendances->pluck('created_at')->map(function ($d) {
-            return $d->format('Y-m-d');
-        })->toArray();
-        $chartData = $attendances->pluck('status')->toArray(); // misal status hadir
+        // Konversi status ke angka (buat grafik)
+        $statusMap = [
+            'present' => 1,
+            'absent' => 0,
+            'sick' => 0.5,
+            'permission' => 0.7,
+        ];
+
+        $chartLabels = $attendances->pluck('date')->toArray();
+        $chartData = $attendances->pluck('status')->map(fn($s) => $statusMap[$s] ?? 0)->toArray();
 
         return view('dashboard.student', compact('student', 'attendances', 'chartLabels', 'chartData'));
     }

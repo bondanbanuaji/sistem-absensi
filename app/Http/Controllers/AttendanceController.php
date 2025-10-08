@@ -86,4 +86,31 @@ class AttendanceController extends Controller
         $attendance->delete();
         return redirect()->route('attendances.index')->with('success', 'Absensi dihapus.');
     }
+
+        /**
+     * Tampilan absensi untuk guru
+     */
+    public function teacherIndex(Request $request)
+    {
+        $attendances = Attendance::with('student')
+            ->latest()
+            ->paginate(10);
+
+        return view('teacher.attendances.index', compact('attendances'));
+    }
+
+    /**
+     * Tampilan absensi untuk siswa (riwayat pribadi)
+     */
+    public function studentIndex()
+    {
+        $user = Auth::user();
+        $student = Student::where('user_id', $user->id)->first();
+
+        $attendances = $student
+            ? Attendance::where('student_id', $student->id)->orderByDesc('date')->paginate(10)
+            : collect();
+
+        return view('student.attendances.index', compact('attendances', 'student'));
+    }
 }

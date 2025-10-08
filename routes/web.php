@@ -38,23 +38,30 @@ Route::get('/dashboard', function () {
     };
 })->middleware('auth')->name('dashboard');
 
-
 // ===== ROLE: ADMIN =====
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    Route::resource('/students', StudentController::class);
-    Route::resource('/attendances', AttendanceController::class);
+    
+    // CRUD siswa & absensi
+    Route::resource('/admin/students', StudentController::class);
+    Route::resource('/admin/attendances', AttendanceController::class);
 });
 
 // ===== ROLE: TEACHER =====
 Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard/teacher', [DashboardController::class, 'teacher'])->name('dashboard.teacher');
-    Route::get('/attendances', [AttendanceController::class, 'index'])->name('teacher.attendance.index');
+
+    // guru hanya bisa kelola absensi
+    Route::get('/teacher/attendances', [AttendanceController::class, 'teacherIndex'])->name('teacher.attendances.index');
+    Route::post('/teacher/attendances', [AttendanceController::class, 'store'])->name('teacher.attendances.store');
 });
 
 // ===== ROLE: STUDENT =====
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard/student', [DashboardController::class, 'student'])->name('dashboard.student');
+
+    // siswa hanya bisa lihat absensinya sendiri
+    Route::get('/student/attendances', [AttendanceController::class, 'studentIndex'])->name('student.attendances.index');
 });
 
 // ===== PROFILE (semua role bisa akses) =====

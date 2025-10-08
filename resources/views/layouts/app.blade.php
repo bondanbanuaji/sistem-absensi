@@ -21,7 +21,7 @@
                     <a href="{{ route('students.index') }}" class="hover:text-indigo-400">Siswa</a>
                     <a href="{{ route('attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
                 @elseif(Auth::user()->role === 'teacher')
-                    <a href="{{ route('teacher.attendance.index') }}" class="hover:text-indigo-400">Absensi</a>
+                    <a href="{{ route('teacher.attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
                 @endif
 
                 @auth

@@ -10,6 +10,6 @@ class Student extends Model
     protected $fillable = ['nis', 'name','kelas','phone','photo'];
 
     public function attedances() {
-        return $this->hasMany('Attendance'::class);
+        return $this->hasMany(Attendance::class);
     }
 }
