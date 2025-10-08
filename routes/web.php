@@ -23,13 +23,8 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// ===== GLOBAL DASHBOARD ROUTE (AMAN UNTUK SEMUA ROLE) =====
 Route::get('/dashboard', function () {
     $user = Auth::user();
-    if (!$user) {
-        return redirect()->route('login');
-    }
-
     return match ($user->role) {
         'admin' => redirect()->route('dashboard.admin'),
         'teacher' => redirect()->route('dashboard.teacher'),
@@ -41,35 +36,26 @@ Route::get('/dashboard', function () {
 // ===== ROLE: ADMIN =====
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    
-    // CRUD siswa & absensi
-    Route::resource('/admin/students', StudentController::class);
-    Route::resource('/admin/attendances', AttendanceController::class);
+    Route::resource('/students', StudentController::class);
+    Route::resource('/attendances', AttendanceController::class);
 });
 
 // ===== ROLE: TEACHER =====
 Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard/teacher', [DashboardController::class, 'teacher'])->name('dashboard.teacher');
-
-    // guru hanya bisa kelola absensi
-    Route::get('/teacher/attendances', [AttendanceController::class, 'teacherIndex'])->name('teacher.attendances.index');
-    Route::post('/teacher/attendances', [AttendanceController::class, 'store'])->name('teacher.attendances.store');
+    Route::resource('/attendances', AttendanceController::class)->only(['index', 'show', 'edit', 'update']);
 });
 
 // ===== ROLE: STUDENT =====
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard/student', [DashboardController::class, 'student'])->name('dashboard.student');
-
-    // siswa hanya bisa lihat absensinya sendiri
-    Route::get('/student/attendances', [AttendanceController::class, 'studentIndex'])->name('student.attendances.index');
 });
 
-// ===== PROFILE (semua role bisa akses) =====
+// ===== PROFILE =====
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ===== AUTH ROUTES =====
 require __DIR__.'/auth.php';
