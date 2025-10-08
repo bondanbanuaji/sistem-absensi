@@ -1,44 +1,57 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-            {{ __('Add Attendance') }}
-        </h2>
-    </x-slot>
+    <x-slot name="header"><h2 class="text-lg font-semibold">Create Attendance</h2></x-slot>
 
-    <div class="py-6 max-w-4xl mx-auto">
-        <x-alert />
-
-        <x-card>
+    <div class="py-6">
+        <div class="max-w-3xl mx-auto">
             <form method="POST" action="{{ route('attendances.store') }}">
                 @csrf
-
-                <div class="mb-4">
-                    <label class="block text-gray-700">Student</label>
-                    <select name="student_id" class="w-full border-gray-300 rounded-lg mt-2">
-                        @foreach ($students as $student)
-                            <option value="{{ $student->id }}">{{ $student->name }}</option>
+                <div class="mb-3">
+                    <label>Student</label>
+                    <select name="student_id" class="w-full rounded border p-2">
+                        @foreach($students as $s)
+                            <option value="{{ $s->id }}">{{ $s->name }} ({{ $s->nis }})</option>
                         @endforeach
                     </select>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-gray-700">Date</label>
-                    <input type="date" name="date" class="w-full border-gray-300 rounded-lg mt-2">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label>Date</label>
+                        <input type="date" name="date" class="w-full rounded border p-2" value="{{ old('date', now()->format('Y-m-d')) }}">
+                    </div>
+
+                    <div>
+                        <label>Status</label>
+                        <select name="status" class="w-full rounded border p-2">
+                            <option value="present">Present</option>
+                            <option value="absent">Absent</option>
+                            <option value="sick">Sick</option>
+                            <option value="permission">Permission</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-gray-700">Status</label>
-                    <select name="status" class="w-full border-gray-300 rounded-lg mt-2">
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                    </select>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                        <label>Time In</label>
+                        <input type="time" name="time_in" class="w-full rounded border p-2">
+                    </div>
+                    <div>
+                        <label>Time Out</label>
+                        <input type="time" name="time_out" class="w-full rounded border p-2">
+                    </div>
                 </div>
 
-                <button type="submit"
-                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                    Save
-                </button>
+                <div class="mt-3">
+                    <label>Note</label>
+                    <input type="text" name="note" class="w-full rounded border p-2">
+                </div>
+
+                <div class="mt-4">
+                    <button class="px-4 py-2 bg-indigo-600 text-white rounded">Save</button>
+                    <a href="{{ url()->previous() }}" class="ml-2 text-gray-600">Cancel</a>
+                </div>
             </form>
-        </x-card>
+        </div>
     </div>
 </x-app-layout>

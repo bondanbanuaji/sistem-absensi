@@ -17,14 +17,14 @@
             <div class="space-x-4">
                 <a href="{{ route('dashboard') }}" class="hover:text-indigo-400">Dashboard</a>
 
-                @if(Auth::user()->role === 'admin')
-                    <a href="{{ route('students.index') }}" class="hover:text-indigo-400">Siswa</a>
-                    <a href="{{ route('attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
-                @elseif(Auth::user()->role === 'teacher')
-                    <a href="{{ route('teacher.attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
-                @endif
-
                 @auth
+                    @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('students.index') }}" class="hover:text-indigo-400">Siswa</a>
+                        <a href="{{ route('attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
+                    @elseif(Auth::user()->role === 'teacher')
+                        <a href="{{ route('teacher.attendances.index') }}" class="hover:text-indigo-400">Absensi</a>
+                    @endif
+
                     <form action="{{ route('logout') }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="hover:text-red-400">Logout</button>
@@ -33,6 +33,7 @@
             </div>
         </div>
     </nav>
+
 
     {{-- Main content --}}
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">

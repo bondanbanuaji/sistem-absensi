@@ -1,49 +1,33 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            Dashboard Guru
-        </h2>
+        <h2 class="text-xl font-semibold leading-tight">Dashboard Guru</h2>
     </x-slot>
 
-    <div class="py-6 max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 max-w-6xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6">
             <h3 class="text-lg font-semibold mb-3">Selamat datang, {{ Auth::user()->name }}!</h3>
-            <p class="text-gray-600 dark:text-gray-300 mb-4">Berikut rekap absensi siswa hari ini:</p>
+            <p class="mb-4 text-gray-600">Rekap absensi hari ini</p>
 
-            {{-- Tabel --}}
+            <div class="mb-4">
+                <a href="{{ route('teacher.attendances.index') }}" class="px-4 py-2 bg-indigo-600 text-white rounded">Open Attendance Page</a>
+            </div>
+
             <div class="overflow-x-auto mb-6">
-                <table class="min-w-full text-left border border-gray-700 rounded-lg">
-                    <thead class="bg-gray-100 dark:bg-gray-700">
-                        <tr>
-                            <th class="py-2 px-4">Nama Siswa</th>
-                            <th class="py-2 px-4">Status</th>
-                            <th class="py-2 px-4">Tanggal</th>
-                        </tr>
+                <table class="min-w-full text-left">
+                    <thead class="bg-gray-100">
+                        <tr><th class="p-2">Student</th><th class="p-2">Status</th><th class="p-2">Date</th></tr>
                     </thead>
                     <tbody>
-                        @forelse ($todayAttendances as $attendance)
-                            <tr class="border-b dark:border-gray-700">
-                                <td class="py-2 px-4">{{ $attendance->student->name ?? '-' }}</td>
-                                <td class="py-2 px-4 capitalize">{{ $attendance->status }}</td>
-                                <td class="py-2 px-4">{{ $attendance->date }}</td>
-                            </tr>
+                        @forelse ($todayAttendances as $at)
+                            <tr><td class="p-2">{{ $at->student->name ?? '-' }}</td><td class="p-2">{{ $at->status }}</td><td class="p-2">{{ $at->date }}</td></tr>
                         @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-3 text-gray-500 dark:text-gray-400">Belum ada data absensi hari ini.</td>
-                            </tr>
+                            <tr><td colspan="3" class="p-4 text-center">No attendance yet</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            {{-- Shortcut ke halaman absensi --}}
-            <a href="{{ route('attendances.index') }}" class="inline-block px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                📋 Kelola Absensi Lengkap
-            </a>
-
-            {{-- Chart --}}
-            <div class="mt-8">
-                <h3 class="text-lg font-semibold mb-4">Grafik Kehadiran Minggu Ini</h3>
+            <div>
                 <canvas id="teacherAttendanceChart"></canvas>
             </div>
         </div>

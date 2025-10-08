@@ -1,64 +1,56 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-            {{ __('Attendance List') }}
-        </h2>
-    </x-slot>
+    <x-slot name="header"><h2 class="text-lg font-semibold">Attendances</h2></x-slot>
 
-    <div class="py-6 max-w-7xl mx-auto">
-        <x-alert />
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="mb-4 flex justify-between items-center">
+                <form method="GET" class="flex gap-2">
+                    <input type="date" name="date" value="{{ request('date') }}" class="rounded border px-2 py-1">
+                    <input type="text" name="name" placeholder="Search student" value="{{ request('name') }}" class="rounded border px-2 py-1">
+                    <button class="px-3 py-1 bg-indigo-600 text-white rounded">Filter</button>
+                </form>
 
-        <x-card>
-            <div class="flex justify-between mb-4">
-                <a href="{{ route('attendances.create') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                    + Add Attendance
-                </a>
+                <div>
+                    <a href="{{ route('attendances.create') }}" class="px-4 py-2 bg-green-600 text-white rounded">+ New Attendance</a>
+                </div>
             </div>
 
-            <table class="w-full border-collapse border border-gray-300">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-3 border text-left">#</th>
-                        <th class="p-3 border text-left">Student</th>
-                        <th class="p-3 border text-left">Date</th>
-                        <th class="p-3 border text-left">Status</th>
-                        <th class="p-3 border text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($attendances as $attendance)
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 border">{{ $loop->iteration }}</td>
-                            <td class="p-3 border">{{ $attendance->student->name }}</td>
-                            <td class="p-3 border">{{ $attendance->date }}</td>
-                            <td class="p-3 border">
-                                <span class="px-2 py-1 rounded text-white 
-                                    {{ $attendance->status === 'Present' ? 'bg-green-500' : 'bg-red-500' }}">
-                                    {{ $attendance->status }}
-                                </span>
-                            </td>
-                            <td class="p-3 border text-center">
-                                <a href="{{ route('attendances.edit', $attendance->id) }}"
-                                   class="text-indigo-600 hover:text-indigo-800 mr-2">Edit</a>
-                                <form action="{{ route('attendances.destroy', $attendance->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        onclick="return confirm('Are you sure?')"
-                                        class="text-red-600 hover:text-red-800">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
+            <div class="bg-white shadow sm:rounded-lg overflow-hidden">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <td colspan="5" class="p-3 text-center text-gray-500">No attendance data found.</td>
+                            <th class="p-2">Student</th>
+                            <th class="p-2">Status</th>
+                            <th class="p-2">Date</th>
+                            <th class="p-2">Time In</th>
+                            <th class="p-2">Time Out</th>
+                            <th class="p-2">Actions</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </x-card>
+                    </thead>
+                    <tbody>
+                        @foreach($attendances as $a)
+                            <tr class="border-t">
+                                <td class="p-2">{{ $a->student->name ?? '-' }}</td>
+                                <td class="p-2">{{ ucfirst($a->status) }}</td>
+                                <td class="p-2">{{ $a->date->format('Y-m-d') }}</td>
+                                <td class="p-2">{{ $a->time_in }}</td>
+                                <td class="p-2">{{ $a->time_out }}</td>
+                                <td class="p-2">
+                                    <a href="{{ route('attendances.edit', $a) }}" class="text-indigo-600">Edit</a>
+                                    <form action="{{ route('attendances.destroy', $a) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete?')">
+                                        @csrf @method('DELETE')
+                                        <button class="text-red-600 ml-2">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div class="p-4">
+                    {{ $attendances->withQueryString()->links() }}
+                </div>
+            </div>
+        </div>
     </div>
 </x-app-layout>

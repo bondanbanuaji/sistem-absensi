@@ -1,17 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            Dashboard Siswa
-        </h2>
+        <h2 class="text-xl font-semibold leading-tight">Dashboard Siswa</h2>
     </x-slot>
 
-    <div class="py-6 max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
-        <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6">
-            <h3 class="text-lg font-semibold mb-3">Halo, {{ Auth::user()->name }}!</h3>
-            <p class="text-gray-600 dark:text-gray-300">Berikut adalah rekap absensi kamu minggu ini:</p>
+    <div class="py-6 max-w-5xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold">Halo, {{ Auth::user()->name }}!</h3>
+            <p class="text-gray-600 mb-4">Rekap absensi mingguanmu:</p>
 
-            {{-- Chart Kehadiran Siswa --}}
-            <div class="mt-6">
+            <div>
                 <canvas id="studentAttendanceChart"></canvas>
             </div>
         </div>
@@ -27,8 +24,8 @@
                 datasets: [{
                     label: 'Kehadiran',
                     data: @json($chartData ?? []),
-                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
+                    borderColor: 'rgba(99,102,241,1)',
+                    backgroundColor: 'rgba(99,102,241,0.7)',
                     borderWidth: 1
                 }]
             },

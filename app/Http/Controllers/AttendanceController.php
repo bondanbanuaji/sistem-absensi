@@ -9,36 +9,89 @@ use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        // admin-only for the resource index and full CRUD
+        // teacher can access teacherIndex and store/edit/update/destroy via routes defined for teacher
+    }
+
+    // Admin: full list (with filters)
     public function index(Request $request)
     {
-        $query = Attendance::with('student');
-
-        // Filter berdasarkan tanggal
-        if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->date);
+        // guard: ensure admin or teacher (depending on how you want)
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
         }
 
-        // Pencarian berdasarkan nama siswa
+        $query = Attendance::with('student');
+
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
         if ($request->filled('name')) {
             $query->whereHas('student', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->name . '%');
             });
         }
 
-        $attendances = $query->latest()->paginate(10);
+        $attendances = $query->latest('date')->paginate(10);
 
         return view('attendances.index', compact('attendances'));
     }
 
+    // Teacher generic listing (dedicated view)
+    public function teacherIndex(Request $request)
+    {
+        if (Auth::user()->role !== 'teacher') {
+            abort(403);
+        }
+
+        $query = Attendance::with('student');
+
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
+        if ($request->filled('name')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->name . '%');
+            });
+        }
+
+        $attendances = $query->latest('date')->paginate(10);
+
+        return view('teacher.attendances.index', compact('attendances'));
+    }
+
+    // Student: own history
+    public function studentIndex()
+    {
+        if (Auth::user()->role !== 'student') {
+            abort(403);
+        }
+
+        $student = Student::where('user_id', Auth::id())->first();
+        $attendances = $student
+            ? Attendance::where('student_id', $student->id)->orderByDesc('date')->paginate(10)
+            : collect();
+
+        return view('student.attendances.index', compact('attendances', 'student'));
+    }
 
     public function create()
     {
+        // admin or teacher can create
+        if (!in_array(Auth::user()->role, ['admin','teacher'])) abort(403);
         $students = Student::orderBy('name')->get();
         return view('attendances.create', compact('students'));
     }
 
     public function store(Request $request)
     {
+        if (!in_array(Auth::user()->role, ['admin','teacher'])) abort(403);
+
         $data = $request->validate([
             'student_id' => 'required|exists:students,id',
             'date' => 'required|date',
@@ -48,25 +101,32 @@ class AttendanceController extends Controller
             'note' => 'nullable|string|max:255',
         ]);
 
-        $recordedBy = Auth::check() ? Auth::user()->id : null;
+        $recordedBy = Auth::id();
 
         Attendance::updateOrCreate(
             ['student_id' => $data['student_id'], 'date' => $data['date']],
             array_merge($data, ['recorded_by' => $recordedBy])
         );
 
-        return redirect()->route('attendances.index', ['date' => $data['date']])
-            ->with('success', 'Absensi tersimpan.');
+        // redirect back to appropriate index depending on role
+        if (Auth::user()->role === 'teacher') {
+            return redirect()->route('teacher.attendances.index')->with('success', 'Absensi tersimpan.');
+        }
+
+        return redirect()->route('attendances.index')->with('success', 'Absensi tersimpan.');
     }
 
     public function edit(Attendance $attendance)
     {
+        if (!in_array(Auth::user()->role, ['admin','teacher'])) abort(403);
         $students = Student::orderBy('name')->get();
         return view('attendances.edit', compact('attendance', 'students'));
     }
 
     public function update(Request $request, Attendance $attendance)
     {
+        if (!in_array(Auth::user()->role, ['admin','teacher'])) abort(403);
+
         $data = $request->validate([
             'student_id' => 'required|exists:students,id',
             'date' => 'required|date',
@@ -78,39 +138,21 @@ class AttendanceController extends Controller
 
         $attendance->update($data);
 
+        // redirect to role-appropriate index
+        if (Auth::user()->role === 'teacher') {
+            return redirect()->route('teacher.attendances.index')->with('success', 'Data absensi diperbarui.');
+        }
+
         return redirect()->route('attendances.index')->with('success', 'Data absensi diperbarui.');
     }
 
     public function destroy(Attendance $attendance)
     {
+        if (!in_array(Auth::user()->role, ['admin','teacher'])) abort(403);
         $attendance->delete();
+        if (Auth::user()->role === 'teacher') {
+            return redirect()->route('teacher.attendances.index')->with('success', 'Absensi dihapus.');
+        }
         return redirect()->route('attendances.index')->with('success', 'Absensi dihapus.');
-    }
-
-        /**
-     * Tampilan absensi untuk guru
-     */
-    public function teacherIndex(Request $request)
-    {
-        $attendances = Attendance::with('student')
-            ->latest()
-            ->paginate(10);
-
-        return view('teacher.attendances.index', compact('attendances'));
-    }
-
-    /**
-     * Tampilan absensi untuk siswa (riwayat pribadi)
-     */
-    public function studentIndex()
-    {
-        $user = Auth::user();
-        $student = Student::where('user_id', $user->id)->first();
-
-        $attendances = $student
-            ? Attendance::where('student_id', $student->id)->orderByDesc('date')->paginate(10)
-            : collect();
-
-        return view('student.attendances.index', compact('attendances', 'student'));
     }
 }

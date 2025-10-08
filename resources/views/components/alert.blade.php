@@ -1,11 +1,15 @@
-@if (session('success'))
-    <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-300" role="alert">
-        {{ session('success') }}
-    </div>
-@endif
+@props(['type' => 'success'])
 
-@if (session('error'))
-    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-300" role="alert">
-        {{ session('error') }}
-    </div>
-@endif
+@php
+    $colors = [
+        'success' => 'bg-green-100 border-green-400 text-green-700',
+        'error'   => 'bg-red-100 border-red-400 text-red-700',
+        'info'    => 'bg-blue-100 border-blue-400 text-blue-700',
+        'warn'    => 'bg-yellow-100 border-yellow-400 text-yellow-700',
+    ];
+    $cls = $colors[$type] ?? $colors['info'];
+@endphp
+
+<div {{ $attributes->merge(['class' => "border px-4 py-3 rounded {$cls}"]) }}>
+    {{ $slot }}
+</div>
